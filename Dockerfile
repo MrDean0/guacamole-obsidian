@@ -5,44 +5,45 @@ ARG VERSION="1.5.2"
 ARG TARGETPLATFORM
 
 ENV \
-  GUAC_VER=${VERSION}
+    GUAC_VER=${VERSION}
 
 # Install build dependencies
 RUN apk add --no-cache                \
-        alsa-lib-dev                  \
-        alsa-tools-dev                \
-        autoconf                      \
-        automake                      \
-        build-base                    \
-        cairo-dev                     \
-        cmake                         \
-        cups-dev                      \
-        faac-dev                      \
-        faad2-dev                     \
-        ffmpeg4-dev                   \
-        git                           \
-        grep                          \
-        gsm-dev                       \
-        gstreamer-dev                 \
-        libjpeg-turbo-dev             \
-        libpng-dev                    \
-        libtool                       \
-        libusb-dev                    \
-        libwebp-dev                   \
-        libxkbfile-dev                \
-        make                          \
-        openh264-dev                  \
-        openssl1.1-compat-dev         \
-        pango-dev                     \
-        pcsc-lite-dev                 \
-        pulseaudio-dev                \
-        util-linux-dev
+    alsa-lib-dev                  \
+    alsa-tools-dev                \
+    autoconf                      \
+    automake                      \
+    build-base                    \
+    cairo-dev                     \
+    cmake                         \
+    cups-dev                      \
+    faac-dev                      \
+    faad2-dev                     \
+    ffmpeg4-dev                   \
+    git                           \
+    grep                          \
+    gsm-dev                       \
+    gstreamer-dev                 \
+    libjpeg-turbo-dev             \
+    libpng-dev                    \
+    libtool                       \
+    libusb-dev                    \
+    libwebp-dev                   \
+    libxkbfile-dev                \
+    make                          \
+    openh264-dev                  \
+    openssl1.1-compat-dev         \
+    pango-dev                     \
+    pcsc-lite-dev                 \
+    pulseaudio-dev                \
+    util-linux-dev                
+
 
 
 # Copy source to container for sake of build
 ARG BUILD_DIR=/tmp/guacamole-server
 RUN cd /tmp && \
-git clone --branch=${GUAC_VER} https://github.com/apache/guacamole-server.git guacamole-server
+    git clone --branch=${GUAC_VER} https://github.com/apache/guacamole-server.git guacamole-server
 
 # replace libwebsockets repo (original repo failed many times)
 RUN sed -i 's#https://libwebsockets.org/repo/libwebsockets#https://github.com/warmcat/libwebsockets#g' ${BUILD_DIR}/src/guacd-docker/bin/build-all.sh
@@ -141,14 +142,14 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; \
     then FREERDP_OPTS="${FREERDP_OPTS_COMMON}    -DWITH_SSE2=ON" && echo "SSE2 active"; \
     else FREERDP_OPTS="${FREERDP_OPTS_COMMON}    -DWITH_SSE2=OFF" && echo "SSE2 disabled"; \
     fi && \
-${BUILD_DIR}/src/guacd-docker/bin/build-all.sh
+    ${BUILD_DIR}/src/guacd-docker/bin/build-all.sh
 
 # Record the packages of all runtime library dependencies
 RUN ${BUILD_DIR}/src/guacd-docker/bin/list-dependencies.sh \
-        ${PREFIX_DIR}/sbin/guacd               \
-        ${PREFIX_DIR}/lib/libguac-client-*.so  \
-        ${PREFIX_DIR}/lib/freerdp2/*guac*.so   \
-        > ${PREFIX_DIR}/DEPENDENCIES
+    ${PREFIX_DIR}/sbin/guacd               \
+    ${PREFIX_DIR}/lib/libguac-client-*.so  \
+    ${PREFIX_DIR}/lib/freerdp2/*guac*.so   \
+    > ${PREFIX_DIR}/DEPENDENCIES
 
 
 # Use same Alpine version as the base for the runtime image
@@ -165,25 +166,25 @@ ARG VERSION="1.5.2"
 ARG POSTGRES_HOST_AUTH_METHOD="trust"
 
 LABEL org.opencontainers.image.ref.name="${PACKAGE}" \
-  org.opencontainers.image.created=$BUILD_RFC3339 \
-  org.opencontainers.image.authors="MaxWaldorf" \
-  org.opencontainers.image.documentation="https://github.com/${PACKAGE}/README.md" \
-  org.opencontainers.image.description="${DESCRIPTION}" \
-  org.opencontainers.image.licenses="GPLv3" \
-  org.opencontainers.image.source="https://github.com/${PACKAGE}" \
-  org.opencontainers.image.revision=$REVISION \
-  org.opencontainers.image.version=$VERSION \
-  org.opencontainers.image.url="https://hub.docker.com/r/${PACKAGE}/"
+    org.opencontainers.image.created=$BUILD_RFC3339 \
+    org.opencontainers.image.authors="MaxWaldorf" \
+    org.opencontainers.image.documentation="https://github.com/${PACKAGE}/README.md" \
+    org.opencontainers.image.description="${DESCRIPTION}" \
+    org.opencontainers.image.licenses="GPLv3" \
+    org.opencontainers.image.source="https://github.com/${PACKAGE}" \
+    org.opencontainers.image.revision=$REVISION \
+    org.opencontainers.image.version=$VERSION \
+    org.opencontainers.image.url="https://hub.docker.com/r/${PACKAGE}/"
 
 ENV \
-  GUAC_VER=${VERSION} \
-  GUACAMOLE_HOME=/app/guacamole \
-  CATALINA_HOME=/opt/tomcat \
-  PG_MAJOR=13 \
-  PGDATA=/config/postgres \
-  POSTGRES_USER=guacamole \
-  POSTGRES_DB=guacamole_db \
-  POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD}
+    GUAC_VER=${VERSION} \
+    GUACAMOLE_HOME=/app/guacamole \
+    CATALINA_HOME=/opt/tomcat \
+    PG_MAJOR=13 \
+    PGDATA=/config/postgres \
+    POSTGRES_USER=guacamole \
+    POSTGRES_DB=guacamole_db \
+    POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD}
 
 # Runtime environment
 ENV LC_ALL=C.UTF-8
@@ -202,20 +203,21 @@ WORKDIR ${GUACAMOLE_HOME}
 
 # Bring runtime environment up to date and install runtime dependencies
 RUN apk add --no-cache                \
-        bash                          \
-        bash-completion               \
-        ca-certificates               \
-        curl                          \
-        ghostscript                   \
-        netcat-openbsd                \
-        openjdk11-jdk                 \
-        postgresql13                  \
-        shadow                        \
-        terminus-font                 \
-        ttf-dejavu                    \
-        ttf-liberation                \
-        tzdata                        \
-        util-linux-login && \
+    bash                          \
+    bash-completion               \
+    ca-certificates               \
+    curl                          \
+    ghostscript                   \
+    netcat-openbsd                \
+    openjdk11-jdk                 \
+    postgresql13                  \
+    shadow                        \
+    terminus-font                 \
+    ttf-dejavu                    \
+    ttf-liberation                \
+    tzdata                        \
+    util-linux-login && \
+    flatpak \
     xargs apk add --no-cache < ${PREFIX_DIR}/DEPENDENCIES
 
 RUN apk add --no-cache -X https://dl-cdn.alpinelinux.org/alpine/edge/testing gosu 
@@ -227,23 +229,23 @@ RUN tar xvzf /tmp/apache-tomcat-9.0.76.tar.gz --strip-components 1 --directory /
 RUN chmod +x /opt/tomcat/bin/*.sh
 
 RUN groupadd tomcat && \
-useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+    useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
 
 RUN chgrp -R tomcat /opt/tomcat && \
-chmod -R g+r /opt/tomcat/conf && \
-chmod g+x /opt/tomcat/conf && \
-chown -R tomcat /opt/tomcat/webapps/ /opt/tomcat/work/ /opt/tomcat/temp/ /opt/tomcat/logs/
+    chmod -R g+r /opt/tomcat/conf && \
+    chmod g+x /opt/tomcat/conf && \
+    chown -R tomcat /opt/tomcat/webapps/ /opt/tomcat/work/ /opt/tomcat/temp/ /opt/tomcat/logs/
 
 # Install guacamole-client and postgres auth adapter
 RUN set -x \
-  && rm -rf ${CATALINA_HOME}/webapps/ROOT \
-  && curl -SLo ${CATALINA_HOME}/webapps/ROOT.war "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-${GUAC_VER}.war" \
-  && curl -SLo ${GUACAMOLE_HOME}/lib/postgresql-42.6.0.jar "https://jdbc.postgresql.org/download/postgresql-42.6.0.jar" \
-  && curl -SLo ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-auth-jdbc-${GUAC_VER}.tar.gz" \
-  && tar -xzf ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz \
-  && cp -R ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions/ \
-  && cp -R ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/postgresql/schema ${GUACAMOLE_HOME}/ \
-  && rm -rf ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER} ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz
+    && rm -rf ${CATALINA_HOME}/webapps/ROOT \
+    && curl -SLo ${CATALINA_HOME}/webapps/ROOT.war "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-${GUAC_VER}.war" \
+    && curl -SLo ${GUACAMOLE_HOME}/lib/postgresql-42.6.0.jar "https://jdbc.postgresql.org/download/postgresql-42.6.0.jar" \
+    && curl -SLo ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-auth-jdbc-${GUAC_VER}.tar.gz" \
+    && tar -xzf ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz \
+    && cp -R ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/postgresql/guacamole-auth-jdbc-postgresql-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions/ \
+    && cp -R ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/postgresql/schema ${GUACAMOLE_HOME}/ \
+    && rm -rf ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER} ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}.tar.gz
 
 ###############################################################################
 ################################# EXTENSIONS ##################################
@@ -251,40 +253,40 @@ RUN set -x \
 
 # Download all extensions
 RUN set -xe \
-  && for ext_name in auth-duo auth-header auth-jdbc auth-json auth-ldap auth-quickconnect auth-sso auth-totp vault history-recording-storage; do \
-  curl -SLo ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-${ext_name}-${GUAC_VER}.tar.gz" \
-  && tar -xzf ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz \
-  ;done
+    && for ext_name in auth-duo auth-header auth-jdbc auth-json auth-ldap auth-quickconnect auth-sso auth-totp vault history-recording-storage; do \
+    curl -SLo ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUAC_VER}/binary/guacamole-${ext_name}-${GUAC_VER}.tar.gz" \
+    && tar -xzf ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz \
+    ;done
 
 # Copy standalone extensions over to extensions-available folder
 RUN set -xe \
-  && for ext_name in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp history-recording-storage; do \
-  cp ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}/guacamole-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
-  ;done
+    && for ext_name in auth-duo auth-header auth-json auth-ldap auth-quickconnect auth-totp history-recording-storage; do \
+    cp ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}/guacamole-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
+    ;done
 
 # Copy SSO extensions over to extensions-available folder
 RUN set -xe \
-  && for ext_name in openid saml cas; do \
-  cp ${GUACAMOLE_HOME}/guacamole-auth-sso-${GUAC_VER}/${ext_name}/guacamole-auth-sso-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
-  ;done
+    && for ext_name in openid saml cas; do \
+    cp ${GUACAMOLE_HOME}/guacamole-auth-sso-${GUAC_VER}/${ext_name}/guacamole-auth-sso-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
+    ;done
 
 # Copy JDBC extensions over to extensions-available folder
 RUN set -xe \
-  && for ext_name in mysql postgresql sqlserver; do \
-  cp ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/${ext_name}/guacamole-auth-jdbc-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
-  ;done
+    && for ext_name in mysql postgresql sqlserver; do \
+    cp ${GUACAMOLE_HOME}/guacamole-auth-jdbc-${GUAC_VER}/${ext_name}/guacamole-auth-jdbc-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
+    ;done
 
 # Copy vault extensions over to extensions-available folder
 RUN set -xe \
-  && for ext_name in ksm; do \
-  cp ${GUACAMOLE_HOME}/guacamole-vault-${GUAC_VER}/${ext_name}/guacamole-vault-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
-  ;done
+    && for ext_name in ksm; do \
+    cp ${GUACAMOLE_HOME}/guacamole-vault-${GUAC_VER}/${ext_name}/guacamole-vault-${ext_name}-${GUAC_VER}.jar ${GUACAMOLE_HOME}/extensions-available/ \
+    ;done
 
 # Clear all extensions leftovers
 RUN set -xe \
-  && for ext_name in auth-duo auth-header auth-jdbc auth-json auth-ldap auth-quickconnect auth-sso auth-totp vault history-recording-storage; do \
-  rm -rf ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER} ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz \
-  ;done
+    && for ext_name in auth-duo auth-header auth-jdbc auth-json auth-ldap auth-quickconnect auth-sso auth-totp vault history-recording-storage; do \
+    rm -rf ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER} ${GUACAMOLE_HOME}/guacamole-${ext_name}-${GUAC_VER}.tar.gz \
+    ;done
 
 ###############################################################################
 ###############################################################################
